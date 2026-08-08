@@ -1,0 +1,41 @@
+# Render Blueprint — Urban Threads backend
+# Deploy: render.com → New → Blueprint → connect this repo
+# All env vars marked sync:false must be set in the Render dashboard.
+
+services:
+  - type: web
+    name: urban-threads-api
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install --no-audit --no-fund && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "5000"
+      - key: CLIENT_URL
+        value: https://clothingwebsite-pink.vercel.app
+      - key: MONGO_URI
+        sync: false       # paste your Atlas connection string in the Render dashboard
+      - key: JWT_SECRET
+        sync: false       # any long random string, e.g. openssl rand -hex 32
+      - key: JWT_EXPIRES_IN
+        value: "7d"
+      # Cloudinary (image uploads) — leave blank if not configured; product seeding
+      # uses Unsplash CDN URLs so the site works without it.
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      # Razorpay (payments) — leave blank for now; checkout falls back to a
+      # placeholder so you can verify the full UI flow.
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
