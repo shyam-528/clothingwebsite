@@ -28,7 +28,18 @@ api.interceptors.request.use((config) => {
 
 // Surface server error messages nicely.
 api.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    // Defensive: if a misconfigured proxy returns HTML (e.g. SPA fallback)
+    // when we asked for JSON, surface a clear error so the UI doesn't try to
+    // render with bogus data.
+    const ct = String(res.headers?.['content-type'] || '');
+    if (ct && !ct.includes('application/json')) {
+      return Promise.reject(
+        new Error(`Expected JSON, got ${ct}. API may not be configured correctly.`)
+      );
+    }
+    return res;
+  },
   (err: AxiosError<{ message?: string }>) => {
     const message =
       err.response?.data?.message || err.message || 'Something went wrong';
