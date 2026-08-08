@@ -4,6 +4,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { CartDrawer } from '@/components/CartDrawer';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
+import { ApiStatusBanner } from '@/components/ApiStatusBanner';
 
 export const PublicLayout = () => {
   const { pathname } = useLocation();
@@ -16,6 +17,7 @@ export const PublicLayout = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ApiStatusBanner />
       <Header />
       <main className="flex-1 pb-20 lg:pb-0">
         <Outlet />

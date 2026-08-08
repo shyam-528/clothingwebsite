@@ -33,6 +33,7 @@ export const Home = () => {
   const [featured, setFeatured] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -43,6 +44,8 @@ export const Home = () => {
         ]);
         setFeatured(f.items);
         setNewArrivals(n.items);
+      } catch (e: any) {
+        setError(e?.message || 'Could not load products');
       } finally {
         setLoading(false);
       }
@@ -130,6 +133,11 @@ export const Home = () => {
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="aspect-[4/5] skeleton rounded-card" />
             ))}
+          </div>
+        ) : error ? (
+          <div className="card p-8 text-center text-muted">
+            <p className="font-medium text-ink dark:text-white">Couldn't load products.</p>
+            <p className="text-sm mt-1">{error}</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

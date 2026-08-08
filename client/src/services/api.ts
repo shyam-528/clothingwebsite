@@ -1,6 +1,15 @@
 import axios, { AxiosError } from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const rawBase = import.meta.env.VITE_API_URL || '';
+
+// Friendly banner shown when API isn't configured. Read by Header.tsx.
+export const apiBaseURL = (rawBase || '').replace(/\/api\/?$/, '').replace(/\/$/, '');
+export const isApiConfigured = Boolean(rawBase);
+
+// When VITE_API_URL is empty we deliberately point at the same origin so
+// axios shows a clear CORS / network error instead of silently calling
+// localhost. The error overlay in the UI explains the next step.
+const baseURL = rawBase || (typeof window !== 'undefined' ? `${window.location.origin}/api` : '/api');
 
 export const api = axios.create({
   baseURL,
