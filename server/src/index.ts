@@ -8,9 +8,27 @@ import { errorHandler, notFound } from './middleware/error';
 
 const app = express();
 
+// Allow the configured client URL plus any Vercel preview/production domains.
+// Empty/missing CLIENT_URL env var falls back to localhost dev origins.
+const allowedOrigins = [
+  env.clientUrl,
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'https://clothingwebsite-pink.vercel.app',
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: [env.clientUrl, 'http://localhost:5173', 'http://localhost:4173'],
+    origin: (origin, cb) => {
+      // Same-origin or no Origin header (server-to-server, curl) → allow.
+      if (!origin) return cb(null, true);
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      // Vercel preview deployments (*.vercel.app) → allow in non-production.
+      if (env.nodeEnv !== 'production' && /\.vercel\.app$/.test(origin)) {
+        return cb(null, true);
+      }
+      return cb(new Error(`CORS blocked: ${origin}`));
+    },
     credentials: true,
   })
 );
